@@ -16,13 +16,13 @@ example is:
 
 
 ```python
-from objdict import *
+from classdict import *
 
-class Person(ObjDict):
+class Person(ClassDict):
 	name = FieldType(expected_type=str, required=True)
 	age = FieldType(expected_type=int)
 
-class Business(ObjDict):
+class Business(ClassDict):
 	name = FieldType(expected_type=str, required=True)
 	owner = EmbeddedFieldType(Person, required=True)
 
