@@ -15,8 +15,9 @@ See the tests for more examples of expected usage/behaviour, but a brief
 example is:
 
 
-```
+```python
 from objdict import *
+
 class Person(ObjDict):
 	name = FieldType(expected_type=str, required=True)
 	age = FieldType(expected_type=int)
