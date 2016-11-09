@@ -98,10 +98,10 @@ class ObjDictError(Exception):
 
 
 __all__ = [
-    ObjDictError,
-    from_blob,
-    to_blob,
-    ClassDict,
-    FieldType,
-    EmbeddedFieldType,
+    "ObjDictError",
+    "from_blob",
+    "to_blob",
+    "ClassDict",
+    "FieldType",
+    "EmbeddedFieldType",
 ]
