@@ -42,7 +42,7 @@ def _list_members_of(objdict_class):
     )
 
 
-class ObjDict(object):
+class ClassDict(object):
 
     def __init__(self, **kwargs):
         members = _list_members_of(self.__class__)
@@ -101,7 +101,7 @@ __all__ = [
     ObjDictError,
     from_blob,
     to_blob,
-    ObjDict,
+    ClassDict,
     FieldType,
     EmbeddedFieldType,
 ]
