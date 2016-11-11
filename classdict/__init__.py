@@ -69,6 +69,50 @@ class ListFieldType(FieldType):
         return list(map(lambda x: from_dict(self.type, x), value))
 
 
+class TupleFieldType(FieldType):
+
+    def __init__(self, *args, **kwargs):
+        if 'expected_type' in kwargs:
+            raise ObjDictError("expected type is not compatible with TupleFieldType, specify element types as *args")
+        kwargs['expected_type'] = args
+        super().__init__(**kwargs)
+
+    def validate(self, value):
+        if not isinstance(value, (tuple, list)):
+            raise ValidationError(
+                "field {name} got value of unexpected type {got}, expected a tuple of types ({type})".format(
+                    name=self._name,
+                    got=type(value),
+                    type=", ".join(map(str, self.type))
+                )
+            )
+        if len(value) != len(self.type):
+            raise ValidationError(
+                "field {name} expected a tuple of length {len}, got tuple of length {got}".format(
+                    name=self._name,
+                    len=len(self.type),
+                    got=len(value)
+                )
+            )
+        for index, (expected, got) in enumerate(zip(self.type, value)):
+            if not isinstance(got, expected):
+                raise ValidationError("field {name} expected element {nth} to be {type}, got type {got}".format(
+                    name=self._name,
+                    nth=index,
+                    type=expected,
+                    got=type(got)
+                ))
+
+    def to_dict(self, value):
+        return tuple(map(to_dict, value))
+
+    def from_dict(self, value):
+        return tuple([
+            cls.from_dict(element)
+            for element, cls in zip(value, self.type)
+        ])
+
+
 def _list_members_of(objdict_class):
     return (
         member
@@ -128,8 +172,8 @@ def to_dict(objdict_instance):
     result = {}
     for member_name, member_value in members:
         stored_value = getattr(objdict_instance, member_name)
-        member_value.validate(stored_value)
         if stored_value is not None:
+            member_value.validate(stored_value)
             blob = member_value.to_dict(stored_value)
             result[member_name] = blob
     return result
@@ -176,4 +220,5 @@ __all__ = [
     "FieldType",
     "EmbeddedFieldType",
     "ListFieldType",
+    "TupleFieldType",
 ]

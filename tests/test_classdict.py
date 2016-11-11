@@ -20,6 +20,10 @@ class Business(ClassDict):
     owner = EmbeddedFieldType(Person, required=True)
 
 
+class RpcMethod(ClassDict):
+    args = TupleFieldType(Person, Business, required=True)
+
+
 class TestClassDict(unittest.TestCase):
 
     def test_expected_type(self):
@@ -71,6 +75,25 @@ class TestClassDict(unittest.TestCase):
                 anything=10,
                 owner=Person()
             )
+
+    def test_tuples(self):
+        test_obj = RpcMethod(args=(
+            Person(name="Kate", age=30),
+            Business(owner=Person(name="Eve", age=40), years_existed=20)
+        ))
+        d = test_obj.to_dict()
+        self.assertDictEqual(d, dict(
+            args=(
+                dict(name="Kate", age=30),
+                dict(owner=dict(name="Eve", age=40), years_existed=20)
+            )
+        ))
+        obj_again = RpcMethod.from_dict(d)
+        self.assertEqual(test_obj.args[0].name, obj_again.args[0].name)
+        self.assertEqual(test_obj.args[0].age, obj_again.args[0].age)
+        self.assertEqual(test_obj.args[1].years_existed, obj_again.args[1].years_existed)
+        self.assertEqual(test_obj.args[1].owner.name, obj_again.args[1].owner.name)
+        self.assertEqual(test_obj.args[1].owner.age, obj_again.args[1].owner.age)
 
     def test_to_dict(self):
         test_obj = Business(
