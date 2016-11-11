@@ -12,7 +12,13 @@ class FieldType(object):
         self._name = name
 
     def validate(self, value):
-        if self.type is not None and not isinstance(value, self.type):
+        if value is None and self.required:
+            raise RequiredFieldError(
+                "field {name} absent but is required".format(
+                    name=self._name
+                )
+            )
+        if self.type is not None and value is not None and not isinstance(value, self.type):
             raise ValidationError(
                 "field {name} got value of unexpected type {got}, expected: {type}".format(
                     got=type(value),
@@ -123,8 +129,9 @@ def to_dict(objdict_instance):
     for member_name, member_value in members:
         stored_value = getattr(objdict_instance, member_name)
         member_value.validate(stored_value)
-        blob = member_value.to_dict(stored_value)
-        result[member_name] = blob
+        if stored_value is not None:
+            blob = member_value.to_dict(stored_value)
+            result[member_name] = blob
     return result
 
 

@@ -51,6 +51,12 @@ class TestClassDict(unittest.TestCase):
                 typed_tags=24
             )
 
+    def test_optional(self):
+        person = Person(name="Bob")
+        d = person.to_dict()
+        self.assertEqual(d["name"], "Bob")
+        self.assertTrue('age' not in d.keys())
+
     def test_required(self):
         with self.assertRaises(RequiredFieldError):
             Business(
