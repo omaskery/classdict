@@ -57,6 +57,10 @@ class TestClassDict(unittest.TestCase):
         self.assertEqual(d["name"], "Bob")
         self.assertTrue('age' not in d.keys())
 
+        person_again = Person.from_dict(d)
+        self.assertEqual(person_again.name, "Bob")
+        self.assertIsNone(person_again.age)
+
     def test_required(self):
         with self.assertRaises(RequiredFieldError):
             Business(
