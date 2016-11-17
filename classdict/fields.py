@@ -1,6 +1,6 @@
 
 
-from .toplevel import to_dict, from_dict
+from .toplevel import to_dict, from_dict, can_consume_dict, can_become_dict
 from .errors import *
 
 
@@ -31,10 +31,10 @@ class FieldType(object):
             )
 
     def to_dict(self, value):
-        return value
+        return to_dict(value)
 
     def from_dict(self, value):
-        return value
+        return from_dict(self.type, value)
 
 
 class EmbeddedFieldType(FieldType):
@@ -44,12 +44,6 @@ class EmbeddedFieldType(FieldType):
             kwargs['expected_type'] = objdict_class
         super().__init__(**kwargs)
         self._class = objdict_class
-
-    def to_dict(self, value):
-        return to_dict(value)
-
-    def from_dict(self, value):
-        return from_dict(self._class, value)
 
 
 class ListFieldType(FieldType):

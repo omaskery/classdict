@@ -17,7 +17,12 @@ class Business(ClassDict):
     anything = FieldType()
     typed_tags = ListFieldType(expected_type=BusinessTag)
     years_existed = FieldType(required=True)
-    owner = EmbeddedFieldType(Person, required=True)
+    owner = FieldType(expected_type=Person, required=True)
+
+
+class SomeLists(ClassDict):
+    people = ListFieldType(expected_type=Person)
+    numbers = ListFieldType(expected_type=int)
 
 
 class RpcMethod(ClassDict):
@@ -64,6 +69,24 @@ class TestClassDict(unittest.TestCase):
         person_again = Person.from_dict(d)
         self.assertEqual(person_again.name, "Bob")
         self.assertIsNone(person_again.age)
+
+    def test_list(self):
+        some_lists = SomeLists(
+            people=[Person(name="Bob", age=10)],
+            numbers=[1, 2, 4, 8, 16]
+        )
+        as_dict = some_lists.to_dict()
+        self.assertDictEqual(
+            as_dict,
+            dict(
+                people=[dict(name="Bob", age=10)],
+                numbers=[1, 2, 4, 8, 16]
+            )
+        )
+        back_to_lists = SomeLists.from_dict(as_dict)
+        self.assertEqual(some_lists.people[0].name, back_to_lists.people[0].name)
+        self.assertEqual(some_lists.people[0].age, back_to_lists.people[0].age)
+        self.assertListEqual(some_lists.numbers, back_to_lists.numbers)
 
     def test_required(self):
         with self.assertRaises(RequiredFieldError):
